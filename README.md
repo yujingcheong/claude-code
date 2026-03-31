@@ -92,6 +92,88 @@ node unpack.mjs
 
 The extracted source will be in the `unpacked/` directory.
 
+## What to Do After Extraction
+
+Once you've run `node unpack.mjs` and the files are in the `unpacked/` directory, here are some things you can do:
+
+### Browse and Read the Source
+
+Open the `unpacked/` directory in your editor of choice:
+
+```bash
+code unpacked/          # VS Code
+idea unpacked/          # IntelliJ / WebStorm
+```
+
+The extracted files are the original TypeScript (`.ts` / `.tsx`) sources, fully readable without any additional processing.
+
+### Enable TypeScript IntelliSense (VS Code)
+
+To get type-checking and autocompletion, add a minimal `tsconfig.json` inside `unpacked/`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}
+```
+
+Then install the type packages that the project relies on:
+
+```bash
+cd unpacked
+npm init -y
+npm install --save-dev typescript @types/node @types/react react ink
+```
+
+Open VS Code from the `unpacked/` folder and IntelliSense will automatically pick up the `tsconfig.json`.
+
+### Search for Specific Functionality
+
+Use your editor's global search, or standard CLI tools:
+
+```bash
+# Find all tool implementations
+grep -r "class.*Tool" unpacked/ --include="*.ts" -l
+
+# Find permission-related code
+grep -r "permission" unpacked/src/hooks/ --include="*.ts" -l
+
+# Find API call sites
+grep -r "anthropic" unpacked/src/services/ --include="*.ts" -l
+```
+
+### Type-check the Extracted Code
+
+After setting up the `tsconfig.json` and installing dependencies above:
+
+```bash
+cd unpacked
+npx tsc --noEmit
+```
+
+This lets you see all type errors and cross-references exactly as the original authors would have seen them.
+
+### Trace the Application Flow
+
+Start from the top-level entry points:
+
+| File | Purpose |
+|------|---------|
+| `src/main.tsx` | CLI bootstrap and Ink UI startup |
+| `src/query.ts` | Claude API calls and streaming |
+| `src/QueryEngine.ts` | Core query execution loop |
+| `src/tools.ts` | Tool registry initialization |
+| `src/commands.ts` | Command registry |
+
 ## Project Structure
 
 ```
