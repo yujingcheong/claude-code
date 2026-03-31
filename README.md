@@ -27,10 +27,21 @@ Anthropic publishes Claude Code as a bundled JavaScript CLI on npm. The publishe
 
 ### Clone this repository
 
+**Using HTTPS** (recommended — no SSH key required):
+
 ```bash
-git clone git@github.com:chatgptprojects/claude-code.git
+git clone https://github.com/yujingcheong/claude-code.git
 cd claude-code
 ```
+
+**Using SSH** (requires an SSH key configured with GitHub):
+
+```bash
+git clone git@github.com:yujingcheong/claude-code.git
+cd claude-code
+```
+
+> If you get `Permission denied (publickey)` when using SSH, use the HTTPS URL above instead, or [add your SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 
 ### Or extract it yourself from npm
 
