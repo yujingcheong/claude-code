@@ -54,6 +54,26 @@ npm run gui
 
 Then open `http://localhost:3000`.
 
+### Windows local start (`C:\Users\abc\`)
+
+If you are starting from `C:\Users\abc\` in PowerShell:
+
+```powershell
+cd C:\Users\abc
+git clone https://github.com/yujingcheong/claude-code.git
+cd .\claude-code
+npm install
+npm run gui
+```
+
+If you already cloned the repo:
+
+```powershell
+cd C:\Users\abc\claude-code
+npm install
+npm run gui
+```
+
 - This launches a local Node server in this repo (`gui/server.mjs`).
 - The page sends your prompt to a local `/api/chat` endpoint.
 - The endpoint executes the local Claude CLI in print mode (`cli.js -p "<prompt>"`) and returns the output.
