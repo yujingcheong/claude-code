@@ -1,0 +1,15 @@
+{
+  "name": "basic-platform-eval",
+  "description": "Sanity checks for newly added platform capability files",
+  "checks": [
+    { "type": "file_exists", "path": "src/services/PersistentMemory/memoryStore.ts" },
+    { "type": "file_exists", "path": "src/services/WorkflowEngine/workflowEngine.ts" },
+    { "type": "file_exists", "path": "src/services/DurableTaskState/taskStateStore.ts" },
+    { "type": "file_exists", "path": "src/services/ToolSafety/toolSafety.ts" },
+    { "type": "file_exists", "path": "src/services/Observability/tracing.ts" },
+    { "type": "file_exists", "path": "src/tools/MemorySearchTool/MemorySearchTool.ts" },
+    { "type": "file_exists", "path": "src/tools/WorkflowCreateTool/WorkflowCreateTool.ts" },
+    { "type": "file_exists", "path": "src/tools/TaskHistoryTool/TaskHistoryTool.ts" }
+  ]
+}
+

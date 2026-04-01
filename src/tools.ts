@@ -83,6 +83,17 @@ import { TaskCreateTool } from './tools/TaskCreateTool/TaskCreateTool.js'
 import { TaskGetTool } from './tools/TaskGetTool/TaskGetTool.js'
 import { TaskUpdateTool } from './tools/TaskUpdateTool/TaskUpdateTool.js'
 import { TaskListTool } from './tools/TaskListTool/TaskListTool.js'
+import { TaskHistoryTool } from './tools/TaskHistoryTool/TaskHistoryTool.js'
+import { MemorySearchTool } from './tools/MemorySearchTool/MemorySearchTool.js'
+import { MemoryWriteTool } from './tools/MemoryWriteTool/MemoryWriteTool.js'
+import { WorkflowCreateTool } from './tools/WorkflowCreateTool/WorkflowCreateTool.js'
+import { WorkflowRunTool } from './tools/WorkflowRunTool/WorkflowRunTool.js'
+import { WorkflowStatusTool } from './tools/WorkflowStatusTool/WorkflowStatusTool.js'
+import { BrowserAutomateTool } from './tools/BrowserAutomateTool/BrowserAutomateTool.js'
+import { EmailSendTool } from './tools/EmailSendTool/EmailSendTool.js'
+import { CalendarTool } from './tools/CalendarTool/CalendarTool.js'
+import { DatabaseQueryTool } from './tools/DatabaseQueryTool/DatabaseQueryTool.js'
+import { WebhookTriggerTool } from './tools/WebhookTriggerTool/WebhookTriggerTool.js'
 import uniqBy from 'lodash-es/uniqBy.js'
 import { isToolSearchEnabledOptimistic } from './utils/toolSearch.js'
 import { isTodoV2Enabled } from './utils/tasks.js'
@@ -216,8 +227,24 @@ export function getAllBaseTools(): Tools {
     ...(SuggestBackgroundPRTool ? [SuggestBackgroundPRTool] : []),
     ...(WebBrowserTool ? [WebBrowserTool] : []),
     ...(isTodoV2Enabled()
-      ? [TaskCreateTool, TaskGetTool, TaskUpdateTool, TaskListTool]
+      ? [
+          TaskCreateTool,
+          TaskGetTool,
+          TaskUpdateTool,
+          TaskListTool,
+          TaskHistoryTool,
+        ]
       : []),
+    MemorySearchTool,
+    MemoryWriteTool,
+    WorkflowCreateTool,
+    WorkflowRunTool,
+    WorkflowStatusTool,
+    BrowserAutomateTool,
+    EmailSendTool,
+    CalendarTool,
+    DatabaseQueryTool,
+    WebhookTriggerTool,
     ...(OverflowTestTool ? [OverflowTestTool] : []),
     ...(CtxInspectTool ? [CtxInspectTool] : []),
     ...(TerminalCaptureTool ? [TerminalCaptureTool] : []),
