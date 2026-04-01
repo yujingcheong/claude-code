@@ -122,6 +122,26 @@ test('runCalendarAction supports list/create and retries transient failures', as
   await new Promise(resolve => server.close(resolve))
 })
 
+test('runCalendarAction does not retry non-retryable 4xx responses', async () => {
+  let attempts = 0
+  const { server, baseUrl } = await createMockServer(async (_req, res) => {
+    attempts += 1
+    res.statusCode = 401
+    res.setHeader('content-type', 'application/json')
+    res.end(JSON.stringify({ error: 'unauthorized' }))
+  })
+
+  process.env.CALENDAR_API_BASE_URL = baseUrl
+  process.env.CALENDAR_API_KEY = 'calendar-key'
+
+  await assert.rejects(
+    () => runCalendarAction({ action: 'list_events' }),
+    /Request failed \(401\)/,
+  )
+  assert.equal(attempts, 1)
+  await new Promise(resolve => server.close(resolve))
+})
+
 test('runSupabaseQuery sends SQL payload to configured RPC endpoint', async () => {
   const requests = []
   const { server, baseUrl } = await createMockServer(async (req, res) => {
@@ -171,4 +191,3 @@ test('runBrowserAction sends action payload to browser runtime', async () => {
   assert.equal(result.received.url, 'https://example.com')
   await new Promise(resolve => server.close(resolve))
 })
-

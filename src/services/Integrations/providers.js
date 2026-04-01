@@ -1,5 +1,7 @@
 const DEFAULT_TIMEOUT_MS = 15_000
 
+class NonRetryableIntegrationError extends Error {}
+
 function getRequiredEnv(name) {
   const value = process.env[name]
   if (!value) {
@@ -21,6 +23,7 @@ async function fetchWithTimeout(url, init, timeoutMs = DEFAULT_TIMEOUT_MS) {
 async function fetchJsonWithRetry(url, init, options = {}) {
   const maxRetries = options.maxRetries ?? 2
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  const retryDelayMs = Math.max(0, options.retryDelayMs ?? 200)
   let lastError = null
 
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
@@ -35,13 +38,18 @@ async function fetchJsonWithRetry(url, init, options = {}) {
       }
 
       if (!response.ok) {
-        const error = new Error(
-          `Request failed (${response.status}): ${
-            typeof parsed === 'string' ? parsed : JSON.stringify(parsed)
-          }`,
-        )
+        const message = `Request failed (${response.status}): ${
+          typeof parsed === 'string' ? parsed : JSON.stringify(parsed)
+        }`
+        const error =
+          response.status >= 500
+            ? new Error(message)
+            : new NonRetryableIntegrationError(message)
         if (response.status >= 500 && attempt < maxRetries) {
           lastError = error
+          if (retryDelayMs > 0) {
+            await new Promise(resolve => setTimeout(resolve, retryDelayMs))
+          }
           continue
         }
         throw error
@@ -50,7 +58,16 @@ async function fetchJsonWithRetry(url, init, options = {}) {
       return { status: response.status, data: parsed }
     } catch (error) {
       lastError = error
+      const nonRetryable =
+        error instanceof NonRetryableIntegrationError ||
+        (error instanceof Error && error.name === 'AbortError')
+      if (nonRetryable) {
+        throw error
+      }
       if (attempt >= maxRetries) break
+      if (retryDelayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, retryDelayMs))
+      }
     }
   }
 
@@ -208,4 +225,3 @@ export async function runBrowserAction(input) {
   )
   return result.data
 }
-
