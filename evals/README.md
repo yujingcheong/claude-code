@@ -5,7 +5,7 @@ This repository includes a minimal evaluation harness for platform capability ch
 Run:
 
 ```bash
-node /home/runner/work/claude-code/claude-code/evals/runner.js
+node evals/runner.js
 ```
 
 The current baseline verifies required files for:
@@ -15,4 +15,3 @@ The current baseline verifies required files for:
 - safety/audit logging
 - observability tracing
 - core new tools
-
