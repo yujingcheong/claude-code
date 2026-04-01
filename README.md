@@ -9,6 +9,41 @@ The source was obtained by unpacking the source map (`cli.js.map`) bundled with 
 - **npm package:** [@anthropic-ai/claude-code v2.1.88](https://www.npmjs.com/package/@anthropic-ai/claude-code/v/2.1.88)
 - **Official homepage:** [github.com/anthropics/claude-code](https://github.com/anthropics/claude-code)
 
+## Status Update (April 2026)
+
+- ✅ Platform capability gaps tracked in this repo are marked as satisfied in `agent-gap-analysis.md`.
+- ✅ Evaluation harness checks and integration tests are present under `evals/`.
+- ✅ Recent Phase 2 hardening includes safer integration retry behavior (avoids retrying non-retryable 4xx and timeout-abort paths).
+
+## How to Start Using This Project
+
+This repository is mainly for source inspection/reference. To quickly use Claude Code with a modern chat-style UX, use the official CLI package:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+claude
+```
+
+`claude` launches the interactive chat-based terminal interface.
+
+If you want to work with this extracted source repository itself:
+
+```bash
+npm run test
+npm run lint
+npm run build
+```
+
+Those scripts validate the local eval/test/lint/build harness in this repo.
+
+## About a Modern Chat-Based Interface
+
+This codebase already includes terminal chat UI building blocks (`src/components/`, `src/ink/`, `src/main.tsx`).  
+So the practical “modern chat interface” path is:
+
+1. use the official `claude` CLI for immediate interactive chat;
+2. use this repository to inspect/extend how that chat UI and agent tooling are implemented.
+
 ## How It Leaked
 
 The source code leak was discovered by [Chaofan Shou (@Fried_rice)](https://x.com/Fried_rice) and posted publicly on March 31, 2026:
