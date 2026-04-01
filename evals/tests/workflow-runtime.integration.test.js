@@ -20,9 +20,12 @@ test('executeWorkflowSteps retries transient failures and records attempts', asy
       id: 'retry-step',
       description: 'Retry once',
       retryCount: 1,
-      simulatedFailureCount: 1,
     },
-  ])
+  ], {
+    simulation: {
+      'retry-step': { failures: 1 },
+    },
+  })
 
   assert.deepEqual(result.completedStepIds, ['retry-step'])
   assert.equal(result.stepAttempts['retry-step'], 2)
@@ -36,10 +39,13 @@ test('executeWorkflowSteps times out steps and throws', async () => {
           id: 'timeout-step',
           description: 'Timeout',
           timeoutMs: 1,
-          simulatedDelayMs: 10,
           retryCount: 0,
         },
-      ]),
+      ], {
+        simulation: {
+          'timeout-step': { delayMs: 10 },
+        },
+      }),
     /timed out/i,
   )
 })

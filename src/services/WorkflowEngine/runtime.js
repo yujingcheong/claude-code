@@ -1,18 +1,21 @@
-export async function executeWorkflowSteps(steps) {
+export async function executeWorkflowSteps(steps, options = {}) {
   const completedStepIds = []
   const stepAttempts = {}
   const checkpoints = []
   const simulatedFailureRemaining = new Map()
+  const simulation = options.simulation ?? {}
 
   for (const step of steps) {
-    simulatedFailureRemaining.set(step.id, Math.max(0, step.simulatedFailureCount ?? 0))
+    const config = simulation[step.id] ?? {}
+    simulatedFailureRemaining.set(step.id, Math.max(0, config.failures ?? 0))
   }
 
   const executeStep = async step => {
     const attempt = (stepAttempts[step.id] ?? 0) + 1
     stepAttempts[step.id] = attempt
     const timeoutMs = Math.max(1, step.timeoutMs ?? 30_000)
-    const simulatedDelayMs = Math.max(0, step.simulatedDelayMs ?? 0)
+    const config = simulation[step.id] ?? {}
+    const simulatedDelayMs = Math.max(0, config.delayMs ?? 0)
     const simulatedFailureLeft = simulatedFailureRemaining.get(step.id) ?? 0
 
     const stepWork = async () => {
