@@ -2,6 +2,7 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { traceAsync } from '../../services/Observability/tracing.js'
 import { appendAuditLog, shouldRequireApproval } from '../../services/ToolSafety/toolSafety.js'
+import { runBrowserAction } from '../../services/Integrations/providers.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 
 const inputSchema = lazySchema(() =>
@@ -18,6 +19,7 @@ const outputSchema = lazySchema(() =>
   z.object({
     ok: z.boolean(),
     message: z.string(),
+    providerResponse: z.unknown().optional(),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -63,11 +65,12 @@ export const BrowserAutomateTool = buildTool({
           event: 'browser_automate',
           input,
         })
+        const providerResponse = await runBrowserAction(input)
         return {
           data: {
             ok: true,
-            message:
-              'Browser connector baseline is enabled. Integrate Playwright runtime for full DOM execution.',
+            message: `Browser action ${input.action} completed via runtime integration`,
+            providerResponse,
           } satisfies Output,
         }
       },

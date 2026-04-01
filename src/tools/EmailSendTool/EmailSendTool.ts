@@ -2,6 +2,7 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { traceAsync } from '../../services/Observability/tracing.js'
 import { appendAuditLog, shouldRequireApproval } from '../../services/ToolSafety/toolSafety.js'
+import { sendEmailViaBrevo } from '../../services/Integrations/providers.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 
 const inputSchema = lazySchema(() =>
@@ -17,6 +18,7 @@ const outputSchema = lazySchema(() =>
   z.object({
     ok: z.boolean(),
     message: z.string(),
+    providerResponse: z.unknown().optional(),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -66,11 +68,12 @@ export const EmailSendTool = buildTool({
           to: input.to,
           subject: input.subject,
         })
+        const providerResponse = await sendEmailViaBrevo(input)
         return {
           data: {
             ok: true,
-            message:
-              'Email connector baseline is enabled. Wire SMTP or provider API for live delivery.',
+            message: 'Email sent via Brevo integration',
+            providerResponse,
           } satisfies Output,
         }
       },

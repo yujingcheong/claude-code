@@ -1,11 +1,15 @@
 import { randomUUID } from 'crypto'
 import { readJsonFile, writeJsonFile } from '../platform/jsonStore.js'
 import { createDurableTask, updateDurableTask } from '../DurableTaskState/taskStateStore.js'
+import { executeWorkflowSteps } from './runtime.js'
 
 export type WorkflowStep = {
   id: string
   description: string
   dependsOn?: string[]
+  timeoutMs?: number
+  retryCount?: number
+  checkpointData?: Record<string, unknown>
 }
 
 export type WorkflowDefinition = {
@@ -24,6 +28,12 @@ export type WorkflowRun = {
   createdAt: number
   updatedAt: number
   completedStepIds: string[]
+  stepAttempts?: Record<string, number>
+  checkpoints?: Array<{
+    stepId: string
+    at: number
+    data?: Record<string, unknown>
+  }>
   taskId?: string
   error?: string
 }
@@ -80,30 +90,26 @@ export async function runWorkflow(workflowId: string): Promise<WorkflowRun | nul
     createdAt: Date.now(),
     updatedAt: Date.now(),
     completedStepIds: [],
+    stepAttempts: {},
+    checkpoints: [],
     taskId: task.id,
   }
 
   try {
-    const remaining = new Set(workflow.steps.map(s => s.id))
-    while (remaining.size > 0) {
-      let progressed = false
-      for (const step of workflow.steps) {
-        if (!remaining.has(step.id)) continue
-        const deps = step.dependsOn ?? []
-        if (!deps.every(dep => run.completedStepIds.includes(dep))) continue
-        run.completedStepIds.push(step.id)
-        remaining.delete(step.id)
-        progressed = true
-      }
-      if (!progressed) {
-        throw new Error('Workflow has cyclic or unsatisfied dependencies')
-      }
-    }
+    const execution = await executeWorkflowSteps(workflow.steps)
+    run.completedStepIds = execution.completedStepIds
+    run.stepAttempts = execution.stepAttempts
+    run.checkpoints = execution.checkpoints
     run.status = 'completed'
     run.updatedAt = Date.now()
     await updateDurableTask(task.id, {
       status: 'completed',
-      result: { runId: run.id, completedStepIds: run.completedStepIds },
+      result: {
+        runId: run.id,
+        completedStepIds: run.completedStepIds,
+        checkpoints: run.checkpoints,
+        stepAttempts: run.stepAttempts,
+      },
     })
   } catch (error: unknown) {
     run.status = 'failed'
@@ -124,4 +130,3 @@ export async function getWorkflowRun(runId: string): Promise<WorkflowRun | null>
   const file = await load()
   return file.runs.find(r => r.id === runId) ?? null
 }
-

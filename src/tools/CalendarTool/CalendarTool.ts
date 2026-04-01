@@ -2,6 +2,7 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { traceAsync } from '../../services/Observability/tracing.js'
 import { appendAuditLog, shouldRequireApproval } from '../../services/ToolSafety/toolSafety.js'
+import { runCalendarAction } from '../../services/Integrations/providers.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 
 const inputSchema = lazySchema(() =>
@@ -18,6 +19,7 @@ const outputSchema = lazySchema(() =>
   z.object({
     ok: z.boolean(),
     message: z.string(),
+    providerResponse: z.unknown().optional(),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -64,11 +66,12 @@ export const CalendarTool = buildTool({
           action: input.action,
           title: input.title,
         })
+        const providerResponse = await runCalendarAction(input)
         return {
           data: {
             ok: true,
-            message:
-              'Calendar connector baseline is enabled. Integrate Google/Microsoft API for live operations.',
+            message: `Calendar action ${input.action} completed via provider integration`,
+            providerResponse,
           } satisfies Output,
         }
       },

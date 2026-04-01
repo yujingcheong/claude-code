@@ -2,6 +2,7 @@ import { z } from 'zod/v4'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { traceAsync } from '../../services/Observability/tracing.js'
 import { appendAuditLog, shouldRequireApproval } from '../../services/ToolSafety/toolSafety.js'
+import { runSupabaseQuery } from '../../services/Integrations/providers.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 
 const inputSchema = lazySchema(() =>
@@ -16,6 +17,7 @@ const outputSchema = lazySchema(() =>
   z.object({
     ok: z.boolean(),
     message: z.string(),
+    providerResponse: z.unknown().optional(),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -61,11 +63,12 @@ export const DatabaseQueryTool = buildTool({
           event: 'database_query',
           readOnly: input.readOnly ?? false,
         })
+        const providerResponse = await runSupabaseQuery(input)
         return {
           data: {
             ok: true,
-            message:
-              'Database connector baseline is enabled. Integrate a real DB adapter for query execution.',
+            message: 'Database query executed via Supabase integration',
+            providerResponse,
           } satisfies Output,
         }
       },
