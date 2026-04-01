@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT_MS = 15_000
+const DEFAULT_TIMEOUT_MS = 15000
 
 class NonRetryableIntegrationError extends Error {}
 
@@ -102,7 +102,7 @@ export async function sendEmailViaBrevo(input) {
       },
       body: JSON.stringify(payload),
     },
-    { maxRetries: 2, timeoutMs: 15_000 },
+    { maxRetries: 2, timeoutMs: 15000 },
   )
 
   const cloudflareLogWebhook = process.env.CLOUDFLARE_EMAIL_LOG_WEBHOOK_URL
@@ -122,7 +122,7 @@ export async function sendEmailViaBrevo(input) {
               : undefined,
         }),
       },
-      { maxRetries: 1, timeoutMs: 8_000 },
+      { maxRetries: 1, timeoutMs: 8000 },
     )
   }
 
@@ -155,7 +155,7 @@ export async function runCalendarAction(input) {
           ...authHeaders,
         },
       },
-      { maxRetries: 2, timeoutMs: 15_000 },
+      { maxRetries: 2, timeoutMs: 15000 },
     )
     return result.data
   }
@@ -175,7 +175,7 @@ export async function runCalendarAction(input) {
         endIso: input.endIso,
       }),
     },
-    { maxRetries: 2, timeoutMs: 15_000 },
+    { maxRetries: 2, timeoutMs: 15000 },
   )
   return result.data
 }
@@ -201,7 +201,7 @@ export async function runSupabaseQuery(input) {
         read_only: Boolean(input.readOnly),
       }),
     },
-    { maxRetries: 2, timeoutMs: 20_000 },
+    { maxRetries: 2, timeoutMs: 20000 },
   )
   return result.data
 }
@@ -221,7 +221,7 @@ export async function runBrowserAction(input) {
       },
       body: JSON.stringify(input),
     },
-    { maxRetries: 2, timeoutMs: 30_000 },
+    { maxRetries: 2, timeoutMs: 30000 },
   )
   return result.data
 }
