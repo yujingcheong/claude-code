@@ -19,7 +19,8 @@
     "prepare": "node -e \"if (!process.env.AUTHORIZED) { console.error('ERROR: Direct publishing is not allowed.\\nPlease see the release workflow documentation to publish this package.'); process.exit(1); }\"",
     "test": "node evals/runner.js && node --test evals/tests/**/*.test.js",
     "lint": "node evals/lint.js",
-    "build": "node evals/build.js"
+    "build": "node evals/build.js",
+    "gui": "node gui/server.mjs"
   },
   "dependencies": {},
   "optionalDependencies": {

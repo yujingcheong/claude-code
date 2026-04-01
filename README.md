@@ -44,6 +44,20 @@ So the practical “modern chat interface” path is:
 1. use the official `claude` CLI for immediate interactive chat;
 2. use this repository to inspect/extend how that chat UI and agent tooling are implemented.
 
+## Local Browser GUI (Minimal)
+
+If you want a simple browser GUI wrapper for this repository, run:
+
+```bash
+npm run gui
+```
+
+Then open `http://localhost:3000`.
+
+- This launches a local Node server in this repo (`gui/server.mjs`).
+- The page sends your prompt to a local `/api/chat` endpoint.
+- The endpoint executes the local Claude CLI in print mode (`cli.js -p "<prompt>"`) and returns the output.
+
 ## How It Leaked
 
 The source code leak was discovered by [Chaofan Shou (@Fried_rice)](https://x.com/Fried_rice) and posted publicly on March 31, 2026:
